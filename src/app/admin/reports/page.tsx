@@ -10,8 +10,24 @@ import {
   Clock, Shield, X
 } from 'lucide-react';
 
+// Report interface
+interface Report {
+  id: string;
+  type: string;
+  contestantId: string;
+  contestantName: string;
+  reportedBy: string;
+  reason: string;
+  timestamp: string;
+  status: string;
+  priority: string;
+  resolution?: string;
+  resolvedBy?: string;
+  resolvedAt?: string;
+}
+
 // Mock reports data
-const mockReports = [
+const mockReports: Report[] = [
   {
     id: 'RPT001',
     type: 'inappropriate_photo',
@@ -97,11 +113,11 @@ const reportTypeIcons: Record<string, React.ElementType> = {
 export default function ReportsPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAdminAuth();
-  const [reports, setReports] = useState(mockReports);
+  const [reports, setReports] = useState<Report[]>(mockReports);
   const [filterStatus, setFilterStatus] = useState<ReportStatus>('all');
   const [filterType, setFilterType] = useState<ReportType>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedReport, setSelectedReport] = useState<typeof mockReports[0] | null>(null);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
