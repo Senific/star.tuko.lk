@@ -63,8 +63,8 @@ pm2 restart star.tuko.lk
 
 ## Tuko OAuth
 
-- **Client ID**: 078a8695298d1816715cc4933c47399c
-- **Client Secret**: fcc8ded2db471d0f1187ffc25e7b0849dcf30607f59f667f7e42dae95f170e33
+- **Client ID**: 4269da8e5d4f344f45b2106fb3384b34
+- **Client Secret**: dd3ce16d65a30e9a5927c4717ed3036dc956096a8f41c2d8e6b25d500d50e05c
 - **Redirect URI**: https://star.tuko.lk/api/auth/tuko/callback
 
 ## Environment Variables (.env)
