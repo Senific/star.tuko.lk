@@ -129,7 +129,7 @@ export async function logAdminAction(
       action,
       targetType: details?.targetType,
       targetId: details?.targetId,
-      details: details?.data,
+      details: details?.data as Prisma.InputJsonValue | undefined,
       ipAddress: details?.ipAddress,
     },
   });
