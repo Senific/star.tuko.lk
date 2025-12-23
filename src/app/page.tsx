@@ -152,7 +152,7 @@ export default function HomePage() {
                 <ArrowRight className="h-5 w-5" />
               </Link>
             ) : (
-              <button onClick={login} className="btn-primary text-lg px-10 py-4 flex items-center space-x-2">
+              <button onClick={() => login()} className="btn-primary text-lg px-10 py-4 flex items-center space-x-2">
                 <span>{t('hero.cta_register')}</span>
                 <ArrowRight className="h-5 w-5" />
               </button>
@@ -359,7 +359,7 @@ export default function HomePage() {
                     Register Now
                   </Link>
                 ) : (
-                  <button onClick={login} className="btn-primary text-lg px-10 py-4">
+                  <button onClick={() => login()} className="btn-primary text-lg px-10 py-4">
                     Login with Tuko to Start
                   </button>
                 )}

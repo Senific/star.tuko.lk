@@ -61,7 +61,7 @@ export default function AdminLoginPage() {
 
           {/* Login with Tuko Button */}
           <button
-            onClick={login}
+            onClick={() => login()}
             className="btn-primary w-full py-4 flex items-center justify-center space-x-2 text-lg"
           >
             <span>Login with Tuko</span>

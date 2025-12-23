@@ -60,7 +60,7 @@ export default function RegisterPage() {
           <p className="text-white/60 mb-8">
             You need to login with Tuko to register as a contestant in Beauty 2026.
           </p>
-          <button onClick={login} className="btn-primary text-lg px-10 py-4">
+          <button onClick={() => login()} className="btn-primary text-lg px-10 py-4">
             {t('nav.login')}
           </button>
         </div>
