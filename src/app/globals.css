@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --royal-gold: #D4AF37;
+  --deep-purple: #4A154B;
+  --hot-pink: #FF1493;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 100%);
+  color: white;
+  min-height: 100vh;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-royal-gold-500 to-royal-gold-400 text-deep-purple-800 font-semibold px-8 py-3 rounded-full 
+           hover:from-royal-gold-400 hover:to-royal-gold-300 transform hover:scale-105 transition-all duration-300 
+           shadow-lg hover:shadow-royal-gold-500/50;
+  }
+
+  .btn-secondary {
+    @apply border-2 border-royal-gold-500 text-royal-gold-500 font-semibold px-8 py-3 rounded-full 
+           hover:bg-royal-gold-500 hover:text-deep-purple-800 transform hover:scale-105 transition-all duration-300;
+  }
+
+  .btn-vote {
+    @apply bg-gradient-to-r from-hot-pink-500 to-hot-pink-400 text-white font-bold px-6 py-2 rounded-full 
+           hover:from-hot-pink-400 hover:to-hot-pink-300 transform hover:scale-110 transition-all duration-300 
+           shadow-lg hover:shadow-hot-pink-500/50;
+  }
+
+  .card-glow {
+    @apply relative overflow-hidden rounded-2xl bg-gradient-to-br from-deep-purple-800/50 to-deep-purple-900/50 
+           border border-royal-gold-500/20 backdrop-blur-sm
+           hover:border-royal-gold-500/50 transition-all duration-500;
+  }
+
+  .card-glow::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-royal-gold-500/10 to-transparent 
+           -translate-x-full hover:translate-x-full transition-transform duration-1000;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-royal-gold-400 via-royal-gold-300 to-royal-gold-400 bg-clip-text text-transparent;
+  }
+
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a0a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4AF37;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f4d148;
+}
+
+/* Animations */
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+.animate-sparkle {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+/* Crown animation */
+@keyframes crown-float {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+.animate-crown {
+  animation: crown-float 3s ease-in-out infinite;
+}

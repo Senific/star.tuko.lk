@@ -1,0 +1,334 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String    @id @default(cuid())
+  tukoId      String    @unique
+  name        String
+  email       String?   @unique
+  phone       String?
+  avatarUrl   String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastLoginAt DateTime?
+  reports     Report[]  @relation("ReportedBy")
+  votes       Vote[]
+
+  @@index([tukoId])
+  @@index([email])
+}
+
+model Admin {
+  id                   String        @id @default(cuid())
+  email                String        @unique
+  passwordHash         String
+  name                 String
+  role                 AdminRole     @default(MODERATOR)
+  isActive             Boolean       @default(true)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  lastLoginAt          DateTime?
+  activityLogs         AdminLog[]
+  approvedApplications Application[] @relation("ApprovedBy")
+  rejectedApplications Application[] @relation("RejectedBy")
+  resolvedReports      Report[]      @relation("ResolvedBy")
+
+  @@index([email])
+}
+
+model Contestant {
+  id            String            @id @default(cuid())
+  contestantNo  String            @unique
+  firstName     String
+  lastName      String
+  dateOfBirth   DateTime
+  age           Int
+  email         String?
+  phone         String            @unique
+  districtId    String
+  provinceId    String
+  address       String?
+  bio           String?
+  talents       String[]
+  height        Int?
+  profilePhoto  String
+  videoUrl      String?
+  status        ContestantStatus  @default(PENDING)
+  isFeatured    Boolean           @default(false)
+  suspendReason String?
+  currentRound  CompetitionRound  @default(REGISTRATION)
+  overallRank   Int?
+  districtRank  Int?
+  provinceRank  Int?
+  tukoUserId    String?
+  bankName      String?
+  bankBranch    String?
+  accountNumber String?
+  accountName   String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  approvedAt    DateTime?
+  application   Application?
+  district      District          @relation(fields: [districtId], references: [id])
+  province      Province          @relation(fields: [provinceId], references: [id])
+  photos        ContestantPhoto[]
+  reports       Report[]          @relation("ReportedContestant")
+  roundResults  RoundResult[]
+  votes         Vote[]
+
+  @@index([districtId])
+  @@index([provinceId])
+  @@index([status])
+  @@index([currentRound])
+  @@index([overallRank])
+}
+
+model ContestantPhoto {
+  id           String     @id @default(cuid())
+  contestantId String
+  url          String
+  caption      String?
+  isPrimary    Boolean    @default(false)
+  sortOrder    Int        @default(0)
+  createdAt    DateTime   @default(now())
+  contestant   Contestant @relation(fields: [contestantId], references: [id], onDelete: Cascade)
+
+  @@index([contestantId])
+}
+
+model Application {
+  id              String            @id @default(cuid())
+  contestantId    String            @unique
+  status          ApplicationStatus @default(PENDING)
+  reviewedAt      DateTime?
+  approvedById    String?
+  rejectedById    String?
+  rejectionReason String?
+  agreedToTerms   Boolean           @default(false)
+  agreedToPrivacy Boolean           @default(false)
+  submittedAt     DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  approvedBy      Admin?            @relation("ApprovedBy", fields: [approvedById], references: [id])
+  contestant      Contestant        @relation(fields: [contestantId], references: [id], onDelete: Cascade)
+  rejectedBy      Admin?            @relation("RejectedBy", fields: [rejectedById], references: [id])
+
+  @@index([status])
+  @@index([submittedAt])
+}
+
+model Vote {
+  id           String           @id @default(cuid())
+  userId       String
+  contestantId String
+  round        CompetitionRound
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime         @default(now())
+  contestant   Contestant       @relation(fields: [contestantId], references: [id], onDelete: Cascade)
+  user         User             @relation(fields: [userId], references: [id])
+
+  @@unique([userId, contestantId, round])
+  @@index([contestantId])
+  @@index([userId])
+  @@index([round])
+  @@index([createdAt])
+}
+
+model VoteCount {
+  id           String           @id @default(cuid())
+  contestantId String
+  round        CompetitionRound
+  count        Int              @default(0)
+  lastUpdated  DateTime         @default(now())
+
+  @@unique([contestantId, round])
+  @@index([round])
+  @@index([count])
+}
+
+model Province {
+  id          String       @id
+  nameEn      String
+  nameSi      String
+  nameTa      String
+  sortOrder   Int          @default(0)
+  contestants Contestant[]
+  districts   District[]
+
+  @@index([sortOrder])
+}
+
+model District {
+  id          String       @id
+  nameEn      String
+  nameSi      String
+  nameTa      String
+  provinceId  String
+  sortOrder   Int          @default(0)
+  contestants Contestant[]
+  province    Province     @relation(fields: [provinceId], references: [id])
+
+  @@index([provinceId])
+  @@index([sortOrder])
+}
+
+model CompetitionPhase {
+  id            String           @id @default(cuid())
+  round         CompetitionRound @unique
+  name          String
+  description   String?
+  startDate     DateTime
+  endDate       DateTime
+  isActive      Boolean          @default(false)
+  votingEnabled Boolean          @default(true)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+}
+
+model RoundResult {
+  id               String           @id @default(cuid())
+  contestantId     String
+  round            CompetitionRound
+  rank             Int
+  voteCount        Int
+  advanced         Boolean          @default(false)
+  isDistrictWinner Boolean          @default(false)
+  isProvinceWinner Boolean          @default(false)
+  isNationalWinner Boolean          @default(false)
+  announcedAt      DateTime?
+  createdAt        DateTime         @default(now())
+  contestant       Contestant       @relation(fields: [contestantId], references: [id], onDelete: Cascade)
+
+  @@unique([contestantId, round])
+  @@index([round])
+  @@index([rank])
+}
+
+model Report {
+  id             String         @id @default(cuid())
+  reportedById   String?
+  isSystemReport Boolean        @default(false)
+  contestantId   String
+  type           ReportType
+  reason         String
+  priority       ReportPriority @default(MEDIUM)
+  status         ReportStatus   @default(PENDING)
+  resolvedById   String?
+  resolution     String?
+  resolvedAt     DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  contestant     Contestant     @relation("ReportedContestant", fields: [contestantId], references: [id], onDelete: Cascade)
+  reportedBy     User?          @relation("ReportedBy", fields: [reportedById], references: [id])
+  resolvedBy     Admin?         @relation("ResolvedBy", fields: [resolvedById], references: [id])
+
+  @@index([contestantId])
+  @@index([status])
+  @@index([priority])
+  @@index([type])
+}
+
+model AdminLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  action     String
+  targetType String?
+  targetId   String?
+  details    Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+  admin      Admin    @relation(fields: [adminId], references: [id])
+
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model VoteAnalytics {
+  id              String           @id @default(cuid())
+  date            DateTime         @db.Date
+  round           CompetitionRound
+  totalVotes      Int              @default(0)
+  uniqueVoters    Int              @default(0)
+  hourlyVotes     Json?
+  votesByDistrict Json?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([date, round])
+  @@index([date])
+}
+
+model Setting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  description String?
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+
+  @@index([key])
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  MODERATOR
+  CONTENT_MANAGER
+}
+
+enum ContestantStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+  DISQUALIFIED
+  WITHDRAWN
+}
+
+enum CompetitionRound {
+  REGISTRATION
+  DISTRICT
+  PROVINCE
+  SEMI_FINAL
+  FINALE
+  COMPLETED
+}
+
+enum ApplicationStatus {
+  DRAFT
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum ReportType {
+  INAPPROPRIATE_PHOTO
+  FAKE_PROFILE
+  VOTE_MANIPULATION
+  INAPPROPRIATE_CONTENT
+  UNDERAGE_SUSPECT
+  COPYRIGHT_VIOLATION
+  OTHER
+}
+
+enum ReportPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ReportStatus {
+  PENDING
+  INVESTIGATING
+  RESOLVED
+  DISMISSED
+}
