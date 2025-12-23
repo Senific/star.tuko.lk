@@ -90,8 +90,11 @@ export async function GET(request: NextRequest) {
       expiresAt: Date.now() + (tokenResponse.expires_in * 1000),
     };
 
-    // Create redirect response
-    const response = NextResponse.redirect(new URL(returnTo, request.url));
+    // Create redirect response - use forwarded host/proto for correct URL behind proxy
+    const forwardedProto = request.headers.get('x-forwarded-proto') || 'https';
+    const forwardedHost = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'star.tuko.lk';
+    const baseUrl = `${forwardedProto}://${forwardedHost}`;
+    const response = NextResponse.redirect(new URL(returnTo, baseUrl));
     
     // Set session cookie
     response.cookies.set('tuko_session', JSON.stringify(session), {
